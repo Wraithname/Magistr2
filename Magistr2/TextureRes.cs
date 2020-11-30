@@ -10,20 +10,71 @@ namespace Magistr2
     class TextureRes
     {
         double[,] matrixFo = new double[5, 5];
-        public double[] Calculation(Image img)
+        public double[] Calculation(int[,] matrix)
         {
+            int[,] graycl = GrayClasses(matrix);
+            double[,] resMat = MatrixCalculation(graycl);
             double[] res = new double[11];
-
+            res[0] = MatrixPower(resMat);
             return res;
         }
-        double MatrixCalculation(Image img)
+        int[,] GrayClasses(int[,] matrix)
         {
-            double result = 0;
-            for(int i=0;i<img.Height;i++)
+            int[,] matrixGrayCl = new int[matrix.GetUpperBound(0) + 1, matrix.Length / (matrix.GetUpperBound(0) + 1)];
+            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
             {
-                for(int j=0;j<img.Width;j++)
+                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                 {
+                    if (matrix[i, j] < 51)
+                    {
+                        matrixGrayCl[i, j] = 0;
+                    }
+                    if (matrix[i, j] > 51 && matrix[i, j] < 102)
+                    { matrixGrayCl[i, j] = 1; }
+                    if (matrix[i, j] > 102 && matrix[i, j] < 153)
+                    { matrixGrayCl[i, j] = 2; }
+                    if (matrix[i, j] > 153 && matrix[i, j] < 204)
+                    { matrixGrayCl[i, j] = 3; }
+                    if (matrix[i, j] > 204 && matrix[i, j] < 255)
+                    { matrixGrayCl[i, j] = 4; }
+                }
+            }
+            return matrixGrayCl;
+        }
+        double[,] MatrixCalculation(int[,] matrix)
+        {
+            double[,] result = new double[5, 5];
 
+            for (int m = 0; m < result.GetUpperBound(0) + 1; m++)
+            {
+                for (int p = 0; p < result.Length / (result.GetUpperBound(0) + 1); p++)
+                {
+                    //Расчёт коэффициентов
+                    for (int i = 0; i < (matrix.GetUpperBound(0) + 1) - 1; i++)
+                    {
+                        for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1) - 1; j++)
+                        {
+                            if (matrix[i, j] == m && matrix[i + 1, j + 1] == p)
+                                result[m, p] += 1;
+                            else
+                                result[m, p] += 0;
+                        }
+                    }
+                }
+            }
+            int sum = 0;
+            for (int m = 0; m < result.GetUpperBound(0) + 1; m++)
+            {
+                for (int p = 0; p < result.Length / (result.GetUpperBound(0) + 1); p++)
+                {
+                    sum +=(int) result[m, p];
+                }
+            }
+            for (int m = 0; m < result.GetUpperBound(0) + 1; m++)
+            {
+                for (int p = 0; p < result.Length / (result.GetUpperBound(0) + 1); p++)
+                {
+                    result[m, p] = result[m, p] / sum;
                 }
             }
             return result;
@@ -31,8 +82,8 @@ namespace Magistr2
         double MatrixPower(double[,] matrix)
         {
             double resSum = 0;
-            for(int i=0;i<matrix.Rank;i++)
-                for(int j=0;j<matrix.Length;j++)
+            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
+                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                 {
                     resSum += matrix[i, j] * matrix[i, j];
                 }
@@ -44,7 +95,7 @@ namespace Magistr2
             for (int i = 0; i < matrix.Rank; i++)
                 for (int j = 0; j < matrix.Length; j++)
                 {
-                    resSum += matrix[i, j] * ((i+1)-(j+1))* ((i + 1) - (j + 1));
+                    resSum += matrix[i, j] * ((i + 1) - (j + 1)) * ((i + 1) - (j + 1));
                 }
             return resSum;
         }
