@@ -28,13 +28,59 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.ImagePlace = new System.Windows.Forms.PictureBox();
+            this.OpenImg = new System.Windows.Forms.Button();
+            this.ResultRes = new System.Windows.Forms.RichTextBox();
+            ((System.ComponentModel.ISupportInitialize)(this.ImagePlace)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // ImagePlace
+            // 
+            this.ImagePlace.Location = new System.Drawing.Point(12, 12);
+            this.ImagePlace.Name = "ImagePlace";
+            this.ImagePlace.Size = new System.Drawing.Size(433, 426);
+            this.ImagePlace.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.ImagePlace.TabIndex = 0;
+            this.ImagePlace.TabStop = false;
+            // 
+            // OpenImg
+            // 
+            this.OpenImg.Location = new System.Drawing.Point(451, 415);
+            this.OpenImg.Name = "OpenImg";
+            this.OpenImg.Size = new System.Drawing.Size(75, 23);
+            this.OpenImg.TabIndex = 1;
+            this.OpenImg.Text = "Открыть";
+            this.OpenImg.UseVisualStyleBackColor = true;
+            this.OpenImg.Click += new System.EventHandler(this.OpenImg_Click);
+            // 
+            // ResultRes
+            // 
+            this.ResultRes.Location = new System.Drawing.Point(452, 13);
+            this.ResultRes.Name = "ResultRes";
+            this.ResultRes.Size = new System.Drawing.Size(336, 396);
+            this.ResultRes.TabIndex = 2;
+            this.ResultRes.Text = "";
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+            this.Controls.Add(this.ResultRes);
+            this.Controls.Add(this.OpenImg);
+            this.Controls.Add(this.ImagePlace);
+            this.Name = "Form1";
+            this.Text = "Текстурные признаки";
+            ((System.ComponentModel.ISupportInitialize)(this.ImagePlace)).EndInit();
+            this.ResumeLayout(false);
+
         }
 
         #endregion
+
+        private System.Windows.Forms.PictureBox ImagePlace;
+        private System.Windows.Forms.Button OpenImg;
+        private System.Windows.Forms.RichTextBox ResultRes;
     }
 }
 
