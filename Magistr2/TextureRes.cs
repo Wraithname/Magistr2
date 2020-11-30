@@ -25,17 +25,17 @@ namespace Magistr2
             {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                 {
-                    if (matrix[i, j] < 51)
+                    if (matrix[i, j] <= 93)
                     {
                         matrixGrayCl[i, j] = 0;
                     }
-                    if (matrix[i, j] > 51 && matrix[i, j] < 102)
+                    if (matrix[i, j] > 93 && matrix[i, j] <= 115)
                     { matrixGrayCl[i, j] = 1; }
-                    if (matrix[i, j] > 102 && matrix[i, j] < 153)
+                    if (matrix[i, j] > 115 && matrix[i, j] <= 137)
                     { matrixGrayCl[i, j] = 2; }
-                    if (matrix[i, j] > 153 && matrix[i, j] < 204)
+                    if (matrix[i, j] > 137 && matrix[i, j] <= 159)
                     { matrixGrayCl[i, j] = 3; }
-                    if (matrix[i, j] > 204 && matrix[i, j] < 255)
+                    if (matrix[i, j] > 159)
                     { matrixGrayCl[i, j] = 4; }
                 }
             }
@@ -45,16 +45,16 @@ namespace Magistr2
         {
             double[,] result = new double[5, 5];
 
-            for (int m = 0; m < result.GetUpperBound(0) + 1; m++)
+            for (int m = 0; m < (result.GetUpperBound(0) + 1); m++)
             {
                 for (int p = 0; p < result.Length / (result.GetUpperBound(0) + 1); p++)
                 {
                     //Расчёт коэффициентов
                     for (int i = 0; i < (matrix.GetUpperBound(0) + 1) - 1; i++)
                     {
-                        for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1) - 1; j++)
+                        for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                         {
-                            if (matrix[i, j] == m && matrix[i + 1, j + 1] == p)
+                            if (matrix[j, i] == m && matrix[j, i+1] == p)
                                 result[m, p] += 1;
                             else
                                 result[m, p] += 0;
