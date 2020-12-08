@@ -7,8 +7,6 @@ namespace Magistr2
 {
     class TextureRes
     {
-        int masslength = 0;
-        int discr = 0;
         /// <summary>
         /// Расчёт текстурных показателей
         /// </summary>
@@ -18,8 +16,9 @@ namespace Magistr2
         /// <returns>Текстурные признаки</returns>
         public double[] Calculation(int[,] matrix, List<int> qvant, int[] rst)
         {
+            if (qvant[0] == 0)
+                qvant.Remove(0);
             masslength = qvant.Count();
-            discr = qvant.Count() / masslength;
             int[,] graycl = GrayClasses(matrix, qvant);
             double[,] resMat = MatrixCalculation(graycl);
             double[] res = new double[11];
@@ -29,6 +28,11 @@ namespace Magistr2
             res[3] = Disper(resMat);
             res[4] = Odnorod(resMat);
             res[5] = SumSr(resMat);
+            res[6] = SumDisp(resMat);
+            res[7] = SumEntr(resMat);
+            res[8] = Entrop(resMat);
+            res[9] = diffDisp(resMat);
+            res[10] = diffEntr(resMat);
             return res;
         }
         #region Работа с матрицей
@@ -51,15 +55,15 @@ namespace Magistr2
             {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                 {
-                    if (matrix[i, j] <= 93)
+                    if (matrix[i, j] <= qvant[0])
                         matrixGrayCl[i, j] = 0;
-                    if (matrix[i, j] > 93 && matrix[i, j] <= 115)
+                    if (matrix[i, j] > qvant[0] && matrix[i, j] <= qvant[1])
                         matrixGrayCl[i, j] = 1;
-                    if (matrix[i, j] > 115 && matrix[i, j] <= 137)
+                    if (matrix[i, j] > qvant[1] && matrix[i, j] <= qvant[2])
                         matrixGrayCl[i, j] = 2;
-                    if (matrix[i, j] > 137 && matrix[i, j] <= 159)
+                    if (matrix[i, j] > qvant[2] && matrix[i, j] <= qvant[3])
                         matrixGrayCl[i, j] = 3;
-                    if (matrix[i, j] > 159)
+                    if (matrix[i, j] > qvant[3])
                         matrixGrayCl[i, j] = 4;
                 }
             }
@@ -152,19 +156,19 @@ namespace Magistr2
             {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                 {
-                    res += ((i + 1) - sr)* ((i + 1) - sr)* matrix[i, j];
+                    res += ((i + 1) - sr) * ((i + 1) - sr) * matrix[i, j];
                 }
             }
             return res;
         }
-        double Odnorod (double[,] matrix)
+        double Odnorod(double[,] matrix)
         {
             double res = 0;
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
             {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                 {
-                    res += (1/(1+((i + 1) * (i + 1) - 2 * (i + 1) * (j + 1) + (j + 1) * (j + 1)))) * matrix[i, j];
+                    res += (1 / (1 + ((i + 1) * (i + 1) - 2 * (i + 1) * (j + 1) + (j + 1) * (j + 1)))) * matrix[i, j];
                 }
             }
             return res;
@@ -177,10 +181,76 @@ namespace Magistr2
             {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                 {
-                    res += ((i+1)+(j+1))*sr[i+j];
+                    res += ((i + 1) + (j + 1)) * sr[i + j];
                 }
             }
             return res;
+        }
+        double SumEntr(double[,] matrix)
+        {
+            double res = 0, left = 0, right = 0;
+            var sr = VectSum(matrix);
+            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
+            {
+                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
+                {
+                    left = sr[i + j];
+                    right = Math.Log(sr[i + j]);
+                    if (left != 0 && right != 0)
+                        res += left * right;
+                }
+            }
+            return -res;
+        }
+        double SumDisp(double[,] matrix)
+        {
+            double res = 0, left = 0, right = 0; ;
+            var sr = VectSum(matrix);
+            var f = SumEntr(matrix);
+            for (int k = 0; k < sr.Length; k++)
+            {
+                left = ((k + 1) - f) * ((k + 1) - f);
+                if (left != 0 && sr[k] != 0)
+                    res += left * sr[k];
+            }
+            return res;
+        }
+        double Entrop(double[,] matrix)
+        {
+            double res = 0, right = 0;
+            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
+            {
+                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
+                {
+                    right = Math.Log(matrix[i, j]);
+                    if (matrix[i, j] != 0 && right != 0)
+                        res += matrix[i, j] * right;
+                }
+            }
+            return -res;
+        }
+        double diffDisp(double[,] matrix)
+        {
+            double res = 0;
+            var sr = UnVectSum(matrix);
+            var h = matrixsr(matrix);
+            for (int k = 0; k < sr.Length; k++)
+            {
+                res += (sr[k] - h) * (sr[k] - h);
+            }
+            return res / (sr.Length - 2);
+        }
+        double diffEntr(double[,] matrix)
+        {
+            double res = 0, right = 0;
+            var sr = UnVectSum(matrix);
+            for (int k = 0; k < sr.Length; k++)
+            {
+                right = Math.Log(sr[k]);
+                if (sr[k] != 0 && right != 0)
+                    res += sr[k] * right;
+            }
+            return -res;
         }
         #endregion
         #region Вспомогательные функции
@@ -248,16 +318,36 @@ namespace Magistr2
                     sr += matrix[i, j];
                 }
             }
-            return sr/ allelement;
+            return sr / allelement;
         }
         double[] VectSum(double[,] matrix)
         {
             double[] res = new double[(matrix.GetUpperBound(0) + 1) + matrix.Length / (matrix.GetUpperBound(0) + 1)];
-            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
+            for (int k = 0; k < res.Length; k++)
             {
-                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
+                for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
                 {
-                    res[i + j] += matrix[i, j];
+                    for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
+                    {
+                        if (k == (i + j))
+                            res[k] += matrix[i, j];
+                    }
+                }
+            }
+            return res;
+        }
+        double[] UnVectSum(double[,] matrix)
+        {
+            double[] res = new double[(matrix.GetUpperBound(0) + 1) + matrix.Length / (matrix.GetUpperBound(0) + 1)];
+            for (int k = 0; k < res.Length; k++)
+            {
+                for (int i = (matrix.GetUpperBound(0) + 1) - 1; i >= 0; i--)
+                {
+                    for (int j = matrix.Length / (matrix.GetUpperBound(0) + 1) - 1; j >= 0; j--)
+                    {
+                        if (k == (i - j))
+                            res[k] += matrix[i, j];
+                    }
                 }
             }
             return res;

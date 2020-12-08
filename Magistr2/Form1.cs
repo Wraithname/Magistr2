@@ -8,9 +8,13 @@ namespace Magistr2
 {
     public partial class Form1 : Form
     {
+        #region Переменные
         TextureRes texture;
         double[] result;
         int[] rest = new int[256];
+        string[] name=new string[]{"Мощность","Контрастность", "Корреляция", "Дисперсия", "Однородность", "Сумма средних", 
+            "Сумма дисперсии", "Сумма энтропии", "Энтропия", "Разница дисперсии", "Разница энтропии" };
+        #endregion
         public Form1()
         {
             InitializeComponent();
@@ -44,11 +48,13 @@ namespace Magistr2
                     var qvant = GetHistogramm(gray,colorGray);
                     for(int j=0;j<255;j++)
                     {
+                        chart1.Series[0].Name = "Повтор яркостей";
+                        chart1.ChartAreas[0].AxisX.Interval = 30;
                         chart1.Series[0].Points.AddXY(j+1, rest[j]);
                     }
                     result=texture.Calculation(colorGray,qvant,rest);
-                    foreach (double s in result)
-                    ResultRes.Text += s.ToString() + Environment.NewLine;
+                    for(int l=0;l<result.Length;l++)
+                    ResultRes.Text += name[l]+": "+result[l] + Environment.NewLine;
                 }
             }
         }
