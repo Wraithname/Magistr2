@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Magistr2
@@ -15,6 +10,7 @@ namespace Magistr2
     {
         TextureRes texture;
         double[] result;
+        int[] rest = new int[256];
         public Form1()
         {
             InitializeComponent();
@@ -29,10 +25,10 @@ namespace Magistr2
                 if (ofd.ShowDialog()==DialogResult.OK)
                 {
                     Image img = Image.FromFile(ofd.FileName);
-                    ImagePlace.Image = new Bitmap(ofd.FileName);
-                    Bitmap gray = ImageProc(new Bitmap(ofd.FileName));
-                    int[,] colorGray = ConvertImgToMatrix(gray);
-                    int[,] colorGray1 = new int[,] { 
+                    Bitmap gray = MakeGrayscale3(new Bitmap(ofd.FileName));
+                    ImagePlace.Image = gray;
+                    
+                    /*int[,] colorGray1 = new int[,] {
                         {132,110,83,155,133,133,138,165,128,85},
                         {113,111,98,160,137,138,131,141,149,100},
                         {125,127,135,142,113,161,130,142,140,91},
@@ -43,38 +39,73 @@ namespace Magistr2
                         {117,112,124,133,131,105,111,136,96,114},
                         {111,113,115,130,135,149,103,136,109,111},
                         {115,101,126,147,119,138,115,139,93,100}
-                    };
-                    result=texture.Calculation(colorGray);
+                    };*/
+                    int[,] colorGray = texture.ConvertImgToMatrix(gray);
+                    var qvant = GetHistogramm(gray,colorGray);
+                    for(int j=0;j<255;j++)
+                    {
+                        chart1.Series[0].Points.AddXY(j+1, rest[j]);
+                    }
+                    result=texture.Calculation(colorGray,qvant,rest);
                     foreach (double s in result)
-                        ResultRes.Text += s.ToString() + Environment.NewLine;
+                    ResultRes.Text += s.ToString() + Environment.NewLine;
                 }
             }
         }
-        Bitmap ImageProc(Bitmap img)
+        private static Bitmap MakeGrayscale3(Bitmap original)
         {
-            Bitmap resimg =new Bitmap(img.Width,img.Height);
-            for(int i=0;i<resimg.Height;i++)
-            {
-                for(int j=0;j<resimg.Width;j++)
-                {
-                    Color pixelColor = img.GetPixel(i, j);
-                    Color newColor = Color.FromArgb(pixelColor.R, 0, 0);
-                    resimg.SetPixel(i, j, newColor);
-                }
-            }    
-            return resimg;
+            Bitmap newBitmap = new Bitmap(original.Width, original.Height);
+            Graphics g = Graphics.FromImage(newBitmap);
+            ColorMatrix colorMatrix = new ColorMatrix(
+               new float[][]
+               {
+            new float[] {.3f, .3f, .3f, 0, 0},
+            new float[] {.59f, .59f, .59f, 0, 0},
+            new float[] {.11f, .11f, .11f, 0, 0},
+            new float[] {0, 0, 0, 1, 0},
+            new float[] {0, 0, 0, 0, 1}
+               });
+            ImageAttributes attributes = new ImageAttributes();
+            attributes.SetColorMatrix(colorMatrix);
+            g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height),
+               0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
+            g.Dispose();
+            return newBitmap;
         }
-        int[,] ConvertImgToMatrix(Bitmap img)
+        
+        private List<int> GetHistogramm(Bitmap image, int[,] mat=null)
         {
-            int[,] matrix = new int[img.Width, img.Height];
-            for(int i=0;i<img.Height;i++)
+            List<int> qvant = new List<int>();
+            if (mat == null)
             {
-                for(int j=0;j<img.Width;j++)
+                
+                for (int x = 0; x < image.Width; x++)
+                    for (int y = 0; y < image.Height; y++)
+                    {
+                        int i = image.GetPixel(x, y).R;
+                        rest[i]++;
+                    }
+                for (int i = 0; i < 256; i++)
                 {
-                    matrix[i, j] = img.GetPixel(j, i).R;
+                    if (rest[i] != 0)
+                        qvant.Add(i);
                 }
             }
-            return matrix;
+            else
+            {
+                for (int x = 0; x < (mat.GetUpperBound(0) + 1); x++)
+                    for (int y = 0; y < mat.Length / (mat.GetUpperBound(0) + 1); y++)
+                    {
+                        int i = mat[x, y];
+                        rest[i]++;
+                    }
+                for (int i = 0; i < 256; i++)
+                {
+                    if (rest[i] != 0)
+                        qvant.Add(i);
+                }
+            }
+            return qvant;
         }
     }
 }
