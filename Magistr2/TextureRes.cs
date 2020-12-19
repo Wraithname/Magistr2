@@ -7,6 +7,7 @@ namespace Magistr2
 {
     class TextureRes
     {
+        int masslength = 0;
         /// <summary>
         /// Расчёт текстурных показателей
         /// </summary>
@@ -16,23 +17,17 @@ namespace Magistr2
         /// <returns>Текстурные признаки</returns>
         public double[] Calculation(int[,] matrix, List<int> qvant, int[] rst)
         {
-            if (qvant[0] == 0)
-                qvant.Remove(0);
             masslength = qvant.Count();
             int[,] graycl = GrayClasses(matrix, qvant);
             double[,] resMat = MatrixCalculation(graycl);
-            double[] res = new double[11];
+            double[] res = new double[7];
             res[0] = MatrixPower(resMat);
-            res[1] = Contrast(resMat);
-            res[2] = Correl(resMat);
-            res[3] = Disper(resMat);
-            res[4] = Odnorod(resMat);
-            res[5] = SumSr(resMat);
-            res[6] = SumDisp(resMat);
-            res[7] = SumEntr(resMat);
-            res[8] = Entrop(resMat);
-            res[9] = diffDisp(resMat);
-            res[10] = diffEntr(resMat);
+            res[1] = Correl(resMat);
+            res[2] = Disper(resMat);
+            res[3] = SumSr(resMat);
+            res[4] = SumDisp(resMat);
+            res[5] = SumEntr(resMat);
+            res[6] = Entrop(resMat);
             return res;
         }
         #region Работа с матрицей
@@ -48,28 +43,46 @@ namespace Magistr2
             }
             return matrix;
         }
-        int[,] GrayClasses(int[,] matrix, List<int> qvant)
+        public int[,] ConvertImgToMatrix(Bitmap img,int fx)
         {
+            int[,] matrix = new int[img.Width, img.Height];
+            for (int i = 0; i < img.Height; i++)
+            {
+                for (int j = 0; j < img.Width; j++)
+                {
+                    if (img.GetPixel(j, i).R + fx > 255)
+                        matrix[i, j] = 255;
+                    else if(img.GetPixel(j, i).R + fx < 0)
+                        matrix[i, j] = 0;
+                   else
+                        matrix[i, j] = img.GetPixel(j, i).R+fx;
+                }
+            }
+            return matrix;
+        }
+        public int[,] GrayClasses(int[,] matrix, List<int> qvant)
+        {
+            int step = qvant.Count() / 4;
             int[,] matrixGrayCl = new int[matrix.GetUpperBound(0) + 1, matrix.Length / (matrix.GetUpperBound(0) + 1)];
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
             {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                 {
-                    if (matrix[i, j] <= qvant[0])
+                    if (matrix[i, j] <= qvant[step])
                         matrixGrayCl[i, j] = 0;
-                    if (matrix[i, j] > qvant[0] && matrix[i, j] <= qvant[1])
+                    if (matrix[i, j] > qvant[step] && matrix[i, j] <= qvant[step*2])
                         matrixGrayCl[i, j] = 1;
-                    if (matrix[i, j] > qvant[1] && matrix[i, j] <= qvant[2])
+                    if (matrix[i, j] > qvant[step * 2] * 2 && matrix[i, j] <= qvant[step * 3])
                         matrixGrayCl[i, j] = 2;
-                    if (matrix[i, j] > qvant[2] && matrix[i, j] <= qvant[3])
+                    if (matrix[i, j] > qvant[step * 3] && matrix[i, j] <= qvant[step * 4 - 1])
                         matrixGrayCl[i, j] = 3;
-                    if (matrix[i, j] > qvant[3])
+                    if (matrix[i, j] > qvant[step * 4 -1])
                         matrixGrayCl[i, j] = 4;
                 }
             }
             return matrixGrayCl;
         }
-        double[,] MatrixCalculation(int[,] matrix)
+        public double[,] MatrixCalculation(int[,] matrix)
         {
             double[,] result = new double[5, 5];
 
@@ -109,7 +122,7 @@ namespace Magistr2
         }
         #endregion
         #region Текстурные признаки
-        double MatrixPower(double[,] matrix)
+        public double MatrixPower(double[,] matrix)
         {
             double resSum = 0;
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
@@ -119,17 +132,7 @@ namespace Magistr2
                 }
             return resSum;
         }
-        double Contrast(double[,] matrix)
-        {
-            double resSum = 0;
-            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
-                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                {
-                    resSum += matrix[i, j] * ((i + 1) * (i + 1) - 2 * (i + 1) * (j + 1) + (j + 1) * (j + 1));
-                }
-            return resSum;
-        }
-        double Correl(double[,] matrix)
+        public double Correl(double[,] matrix)
         {
             double entr = 0, left = 0, right = 0;
             var hx = midleqvadrx(matrix);
@@ -148,7 +151,7 @@ namespace Magistr2
             }
             return entr;
         }
-        double Disper(double[,] matrix)
+        public double Disper(double[,] matrix)
         {
             double res = 0;
             var sr = matrixsr(matrix);
@@ -161,19 +164,7 @@ namespace Magistr2
             }
             return res;
         }
-        double Odnorod(double[,] matrix)
-        {
-            double res = 0;
-            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
-            {
-                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                {
-                    res += (1 / (1 + ((i + 1) * (i + 1) - 2 * (i + 1) * (j + 1) + (j + 1) * (j + 1)))) * matrix[i, j];
-                }
-            }
-            return res;
-        }
-        double SumSr(double[,] matrix)
+        public double SumSr(double[,] matrix)
         {
             double res = 0;
             var sr = VectSum(matrix);
@@ -186,7 +177,7 @@ namespace Magistr2
             }
             return res;
         }
-        double SumEntr(double[,] matrix)
+        public double SumEntr(double[,] matrix)
         {
             double res = 0, left = 0, right = 0;
             var sr = VectSum(matrix);
@@ -202,9 +193,9 @@ namespace Magistr2
             }
             return -res;
         }
-        double SumDisp(double[,] matrix)
+        public double SumDisp(double[,] matrix)
         {
-            double res = 0, left = 0, right = 0; ;
+            double res = 0, left = 0;
             var sr = VectSum(matrix);
             var f = SumEntr(matrix);
             for (int k = 0; k < sr.Length; k++)
@@ -215,7 +206,7 @@ namespace Magistr2
             }
             return res;
         }
-        double Entrop(double[,] matrix)
+        public double Entrop(double[,] matrix)
         {
             double res = 0, right = 0;
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
@@ -226,29 +217,6 @@ namespace Magistr2
                     if (matrix[i, j] != 0 && right != 0)
                         res += matrix[i, j] * right;
                 }
-            }
-            return -res;
-        }
-        double diffDisp(double[,] matrix)
-        {
-            double res = 0;
-            var sr = UnVectSum(matrix);
-            var h = matrixsr(matrix);
-            for (int k = 0; k < sr.Length; k++)
-            {
-                res += (sr[k] - h) * (sr[k] - h);
-            }
-            return res / (sr.Length - 2);
-        }
-        double diffEntr(double[,] matrix)
-        {
-            double res = 0, right = 0;
-            var sr = UnVectSum(matrix);
-            for (int k = 0; k < sr.Length; k++)
-            {
-                right = Math.Log(sr[k]);
-                if (sr[k] != 0 && right != 0)
-                    res += sr[k] * right;
             }
             return -res;
         }
@@ -330,22 +298,6 @@ namespace Magistr2
                     for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                     {
                         if (k == (i + j))
-                            res[k] += matrix[i, j];
-                    }
-                }
-            }
-            return res;
-        }
-        double[] UnVectSum(double[,] matrix)
-        {
-            double[] res = new double[(matrix.GetUpperBound(0) + 1) + matrix.Length / (matrix.GetUpperBound(0) + 1)];
-            for (int k = 0; k < res.Length; k++)
-            {
-                for (int i = (matrix.GetUpperBound(0) + 1) - 1; i >= 0; i--)
-                {
-                    for (int j = matrix.Length / (matrix.GetUpperBound(0) + 1) - 1; j >= 0; j--)
-                    {
-                        if (k == (i - j))
                             res[k] += matrix[i, j];
                     }
                 }
