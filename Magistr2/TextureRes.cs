@@ -68,16 +68,19 @@ namespace Magistr2
             {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                 {
-                    if (matrix[i, j] <= qvant[step])
-                        matrixGrayCl[i, j] = 0;
-                    if (matrix[i, j] > qvant[step] && matrix[i, j] <= qvant[step*2])
-                        matrixGrayCl[i, j] = 1;
-                    if (matrix[i, j] > qvant[step * 2] * 2 && matrix[i, j] <= qvant[step * 3])
-                        matrixGrayCl[i, j] = 2;
-                    if (matrix[i, j] > qvant[step * 3] && matrix[i, j] <= qvant[step * 4 - 1])
-                        matrixGrayCl[i, j] = 3;
-                    if (matrix[i, j] > qvant[step * 4 -1])
-                        matrixGrayCl[i, j] = 4;
+                    if (matrix[i, j] != -1)
+                    {
+                        if (matrix[i, j] <= qvant[step])
+                            matrixGrayCl[i, j] = 0;
+                        if (matrix[i, j] > qvant[step] && matrix[i, j] <= qvant[step * 2])
+                            matrixGrayCl[i, j] = 1;
+                        if (matrix[i, j] > qvant[step * 2] * 2 && matrix[i, j] <= qvant[step * 3])
+                            matrixGrayCl[i, j] = 2;
+                        if (matrix[i, j] > qvant[step * 3] && matrix[i, j] <= qvant[step * 4 - 1])
+                            matrixGrayCl[i, j] = 3;
+                        if (matrix[i, j] > qvant[step * 4 - 1])
+                            matrixGrayCl[i, j] = 4;
+                    }
                 }
             }
             return matrixGrayCl;
@@ -90,15 +93,20 @@ namespace Magistr2
             {
                 for (int p = 0; p < result.Length / (result.GetUpperBound(0) + 1); p++)
                 {
+                    int test = matrix.GetUpperBound(0)+1;
+                    int test2 = (matrix.Length / (matrix.GetUpperBound(0)+1));
                     //Расчёт коэффициентов
-                    for (int i = 0; i < (matrix.GetUpperBound(0) + 1) - 1; i++)
+                    for (int i = 0; i < (matrix.Length / (matrix.GetUpperBound(0)+1))-1; i++)
                     {
-                        for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
+                        for (int j = 0; j <  matrix.GetUpperBound(0)+1; j++)
                         {
-                            if (matrix[j, i] == m && matrix[j, i + 1] == p)
-                                result[m, p] += 1;
-                            else
-                                result[m, p] += 0;
+                            if (matrix[j, i] != -1)
+                            {
+                                if (matrix[j, i] == m && matrix[j, i + 1] == p)
+                                    result[m, p] += 1;
+                                else
+                                    result[m, p] += 0;
+                            }
                         }
                     }
                 }

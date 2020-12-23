@@ -53,7 +53,8 @@ namespace Magistr2
                     for (int y = 0; y < mat.Length / (mat.GetUpperBound(0) + 1); y++)
                     {
                         int i = mat[x, y];
-                        rest[i]++;
+                        if (i != -1)
+                            rest[i]++;
                     }
                 for (int i = 0; i < 256; i++)
                 {
@@ -63,83 +64,78 @@ namespace Magistr2
             }
             return qvant;
         }
-        private Bitmap bitmapToBlack(Bitmap bit)
+
+        public int[,] GetCountorPoints(Bitmap img)
         {
-            for (int i = 0; i < bit.Width; i++)
-            {
-                for (int j = 0; j < bit.Height; j++)
-                {
-                    if (bit.GetPixel(i, j).R <= 155 && bit.GetPixel(i, j).G <= 155 && bit.GetPixel(i, j).B <= 155)
-                        bit.SetPixel(i, j, Color.Black);
-                    else
-                        bit.SetPixel(i, j, Color.White);
-                }
-            }
-            return bit;
-        }
-        public Color[][] GetCountur(Image img)
-        {
-            int height = img.Height, width = img.Width;
-            Bitmap bp = bitmapToBlack(new Bitmap(img));
-            Color[][] colorMatrix = new Color[width][];
-            for (int i = 1; i < width - 1; i++)
-            {
-                colorMatrix[i] = new Color[height];
-                for (int j = 1; j < height - 1; j++)
-                {
-                    if (bp.GetPixel(i, j).R == 0 && bp.GetPixel(i, j).G == 0 && bp.GetPixel(i, j).B == 0)
-                        if (bp.GetPixel(i + 1, j + 1).R == 255 && bp.GetPixel(i + 1, j + 1).G == 255 && bp.GetPixel(i + 1, j + 1).B == 255 ||
-                            bp.GetPixel(i + 1, j).R == 255 && bp.GetPixel(i + 1, j).G == 255 && bp.GetPixel(i + 1, j).B == 255 ||
-                            bp.GetPixel(i + 1, j - 1).R == 255 && bp.GetPixel(i + 1, j - 1).G == 255 && bp.GetPixel(i + 1, j - 1).B == 255 ||
-                            bp.GetPixel(i, j + 1).R == 255 && bp.GetPixel(i, j + 1).G == 255 && bp.GetPixel(i, j + 1).B == 255 ||
-                            bp.GetPixel(i, j - 1).R == 255 && bp.GetPixel(i, j - 1).G == 255 && bp.GetPixel(i, j - 1).B == 255 ||
-                            bp.GetPixel(i - 1, j + 1).R == 255 && bp.GetPixel(i - 1, j + 1).G == 255 && bp.GetPixel(i - 1, j + 1).B == 255 ||
-                            bp.GetPixel(i - 1, j).R == 255 && bp.GetPixel(i - 1, j).G == 255 && bp.GetPixel(i - 1, j).B == 255 ||
-                            bp.GetPixel(i - 1, j - 1).R == 255 && bp.GetPixel(i - 1, j - 1).G == 255 && bp.GetPixel(i - 1, j - 1).B == 255)
-                        {
-                            bp.SetPixel(i, j, Color.Red);
-                        }
-                }
-            }
-            return colorMatrix;
-        }
-        private Bitmap BitmapToBlack(Bitmap bit)
-        {
-            for (int i = 0; i < bit.Width; i++)
-            {
-                for (int j = 0; j < bit.Height; j++)
-                {
-                    if (bit.GetPixel(i, j).R <= 155 && bit.GetPixel(i, j).G <= 155 && bit.GetPixel(i, j).B <= 155)
-                        bit.SetPixel(i, j, Color.Black);
-                    else
-                        bit.SetPixel(i, j, Color.White);
-                }
-            }
-            return bit;
-        }
-        public List<Point> GetCountorPoints(Bitmap img)
-        {
-            Bitmap bp = BitmapToBlack((Bitmap)img);
+            int colorBackr = img.GetPixel(0, 0).R;
+            Bitmap tecImg = new Bitmap(img);
             List<Point> objectsPoints = new List<Point>();
-            for (int i = 1; i < img.Width - 1; i++)
+            TextureRes texture = new TextureRes();
+            int i = 0, j = 0;
+            while (i < img.Width-1)
             {
-                for (int j = 1; j < img.Height - 1; j++)
+                if (j == img.Height)
                 {
-                    if (bp.GetPixel(i, j).R == 0 && bp.GetPixel(i, j).G == 0 && bp.GetPixel(i, j).B == 0)
-                        if (bp.GetPixel(i + 1, j + 1).R == 255 && bp.GetPixel(i + 1, j + 1).G == 255 && bp.GetPixel(i + 1, j + 1).B == 255 ||
-                            bp.GetPixel(i + 1, j).R == 255 && bp.GetPixel(i + 1, j).G == 255 && bp.GetPixel(i + 1, j).B == 255 ||
-                            bp.GetPixel(i + 1, j - 1).R == 255 && bp.GetPixel(i + 1, j - 1).G == 255 && bp.GetPixel(i + 1, j - 1).B == 255 ||
-                            bp.GetPixel(i, j + 1).R == 255 && bp.GetPixel(i, j + 1).G == 255 && bp.GetPixel(i, j + 1).B == 255 ||
-                            bp.GetPixel(i, j - 1).R == 255 && bp.GetPixel(i, j - 1).G == 255 && bp.GetPixel(i, j - 1).B == 255 ||
-                            bp.GetPixel(i - 1, j + 1).R == 255 && bp.GetPixel(i - 1, j + 1).G == 255 && bp.GetPixel(i - 1, j + 1).B == 255 ||
-                            bp.GetPixel(i - 1, j).R == 255 && bp.GetPixel(i - 1, j).G == 255 && bp.GetPixel(i - 1, j).B == 255 ||
-                            bp.GetPixel(i - 1, j - 1).R == 255 && bp.GetPixel(i - 1, j - 1).G == 255 && bp.GetPixel(i - 1, j - 1).B == 255)
-                        {
-                            objectsPoints.Add(new Point(i, j));
-                        }
+                    j = 0;
+                    i++;
+                }
+                if (img.GetPixel(i, j).R != colorBackr)
+                {
+                    objectsPoints.Add(new Point(i, j));
+                }
+                j++;
+            }
+            int xmin = int.MaxValue, ymin = int.MaxValue, ymax = int.MinValue, xmax = int.MinValue;
+            foreach (Point pt in objectsPoints)
+            {
+                if (objectsPoints.Contains(pt))
+                {
+                    if (pt.X > xmax) xmax = pt.X;
+                    if (pt.X < xmin) xmin = pt.X;
+                    if (pt.Y > ymax) ymax = pt.Y;
+                    if (pt.Y < ymin) ymin = pt.Y;
                 }
             }
-            return objectsPoints;
+
+            int[,] resmat = new int[xmax - xmin + 1, ymax - ymin + 1];
+            int y1 = 0, x1 = 0;
+            for (int y = ymin; y <= ymax; y++)
+            {
+                for (int x = xmin; x <= xmax; x++)
+                {
+                    resmat[x1, y1] = tecImg.GetPixel(x, y).R;
+                    x1++;
+                }
+                x1 = 0;
+                y1++;
+            }
+            bool flag;
+            int ydet = ymax - ymin; 
+            int xdet=xmax-xmin-1;
+            int k = 0, l = 0;
+            flag = true;
+            while(k<xdet)  
+            {
+                var tr = new Point(k + xmin, l + ymin);
+                if (l==ydet)
+                {
+                    k++;
+                    l = 0;
+                }
+                    if (!objectsPoints.Contains(tr) && flag)
+                    {
+                        resmat[k, l] = -1;
+                    }
+                    else
+                    {
+                        if (flag)
+                            flag = false;
+                        else
+                            flag = true;
+                    }
+                l++;
+            }
+            return resmat;
         }
     }
 }

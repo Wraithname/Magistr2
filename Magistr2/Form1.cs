@@ -28,17 +28,20 @@ namespace Magistr2
 
         private void OpenImg_Click(object sender, EventArgs e)
         {
+            #region Работа с массивом изображений
             /*
             using (FolderBrowserDialog fbd = new FolderBrowserDialog())
             {
                 if (fbd.ShowDialog() == DialogResult.OK)
                 {
-                    process.CalculatingTextureByTasks(fbd.SelectedPath, 0f);
+                    Thread th = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, 0f));
+                    th.IsBackground = true;
                     Thread[] listthread = new Thread[3];
                     Thread[] listthread2 = new Thread[3];
                     listthread[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.3f));
                     listthread[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.2f));
                     listthread[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.1f));
+                    th.Start();
                     foreach (var thread in listthread)
                     {
                         thread.Start();
@@ -58,23 +61,26 @@ namespace Magistr2
                     {
                         thread.Join();
                     }
+                    th.Join();
                 }
             }
             MessageBox.Show("Расчёт окончен. Результаты находятся в папке 'C:\r'", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Information);
             */
+            #endregion
             #region Работа с одним изображением
             
-           using (OpenFileDialog ofd = new OpenFileDialog())
-           {
-               ofd.Filter = "Image Files(*.jpg; *.jpeg; *.png; *.bmp)|*.jpg; *.jpeg; *.png; *.bmp";
-               if (ofd.ShowDialog() == DialogResult.OK)
-               {
-                   Image img = Image.FromFile(ofd.FileName);
-                    List<Point> objectsPoints = imgproc.GetCountorPoints(new Bitmap(img));
-                   Bitmap gray = imgproc.MakeGrayscale3(new Bitmap(ofd.FileName),0f);
-                   ImagePlace.Image = gray;
+            using (OpenFileDialog ofd = new OpenFileDialog())
+            {
+                ofd.Filter = "Image Files(*.jpg; *.jpeg; *.png; *.bmp)|*.jpg; *.jpeg; *.png; *.bmp";
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    Image img = Image.FromFile(ofd.FileName);
+                    
+                    Bitmap gray = imgproc.MakeGrayscale3(new Bitmap(ofd.FileName), 0f);
+                    var objectsPoints = imgproc.GetCountorPoints(gray);
+                    ImagePlace.Image = gray;
 
-                   int[,] colorGray1 = new int[,] {
+                    int[,] colorGray1 = new int[,] {
                       {132,110,83,155,133,133,138,165,128,85},
                       {113,111,98,160,137,138,131,141,149,100},
                       {125,127,135,142,113,161,130,142,140,91},
@@ -86,22 +92,22 @@ namespace Magistr2
                       {111,113,115,130,135,149,103,136,109,111},
                       {115,101,126,147,119,138,115,139,93,100}
                   };
+                    
+                    //int[,] colorGray = texture.ConvertImgToMatrix(gray);
+                    var qvant = imgproc.GetHistogramm(gray, objectsPoints);
+                    for (int j = 0; j < 255; j++)
+                    {
+                        chart1.Series[0].Name = "Повтор яркостей";
+                        chart1.ChartAreas[0].AxisX.Interval = 30;
+                        chart1.Series[0].Points.AddXY(j + 1, imgproc.rest[j]);
+                    }
+                    result = texture.Calculation(objectsPoints, qvant, imgproc.rest);
+                    for (int l = 0; l < result.Length; l++)
+                        ResultRes.Text += name[l] + ": " + result[l] + Environment.NewLine;
 
-                   int[,] colorGray = texture.ConvertImgToMatrix(gray);
-                   var qvant = imgproc.GetHistogramm(gray, colorGray);
-                   for (int j = 0; j < 255; j++)
-                   {
-                       chart1.Series[0].Name = "Повтор яркостей";
-                       chart1.ChartAreas[0].AxisX.Interval = 30;
-                       chart1.Series[0].Points.AddXY(j + 1, imgproc.rest[j]);
-                   }
-                   result = texture.Calculation(colorGray, qvant, imgproc.rest);
-                   for (int l = 0; l < result.Length; l++)
-                       ResultRes.Text += name[l] + ": " + result[l] + Environment.NewLine;
-                   
-        }
-    }
-       
+                }
+            }
+            
             #endregion
 
         }

@@ -6,14 +6,18 @@ namespace Magistr2.CSVWork
 {
     class CSVProcess
     {
-        private void WriteToFile(double[] resultie,string name, float fx)
+        private void WriteToFile(double[] resultie, string name, float fx)
         {
-            string pathCsvFile = @"C:\r\ResultOf" + name + "Britnes" + fx.ToString() + ".csv";
+            if (!Directory.Exists(@"C:\r"))
+                Directory.CreateDirectory(@"C:\r");
+            if (!Directory.Exists(@"C:\r\" + name))
+                Directory.CreateDirectory(@"C:\r\" + name);
+
+            string pathCsvFile = @"C:\r\" + name + @"\Britnes" + fx.ToString() + ".csv";
             string delimiter = ",";
             StringBuilder sb = new StringBuilder();
             for (int index = 0; index < resultie.Length; index++)
                 sb.AppendLine(string.Join(delimiter, resultie[index]));
-
             File.WriteAllText(pathCsvFile, sb.ToString());
         }
         public void CalculatingTextureByTasks(string folderPath, float fx)
@@ -31,8 +35,8 @@ namespace Magistr2.CSVWork
             double[] resultCalculation6 = new double[imgall.Length];
             foreach (string img in imgall)
             {
-                Bitmap gray = imgproc.MakeGrayscale3(new Bitmap(img),fx);
-                int[,] colorGray = texture.ConvertImgToMatrix(gray);
+                Bitmap gray = imgproc.MakeGrayscale3(new Bitmap(img), fx);
+                int[,] colorGray = imgproc.GetCountorPoints(gray);
                 var qvant = imgproc.GetHistogramm(gray, colorGray);
                 int[,] graycl = texture.GrayClasses(colorGray, qvant);
                 double[,] resMat = texture.MatrixCalculation(graycl);
