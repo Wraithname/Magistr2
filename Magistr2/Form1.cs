@@ -34,33 +34,10 @@ namespace Magistr2
             {
                 if (fbd.ShowDialog() == DialogResult.OK)
                 {
+                    this.Hide();
                     Thread th = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, 0f));
                     th.IsBackground = true;
-                    Thread[] listthread = new Thread[3];
-                    Thread[] listthread2 = new Thread[3];
-                    listthread[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.3f));
-                    listthread[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.2f));
-                    listthread[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.1f));
                     th.Start();
-                    foreach (var thread in listthread)
-                    {
-                        thread.Start();
-                    }
-                    foreach (var thread in listthread)
-                    {
-                        thread.Join();
-                    }
-                    listthread2[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .1f));
-                    listthread2[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .2f));
-                    listthread2[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .3f));
-                    foreach (var thread in listthread2)
-                    {
-                        thread.Start();
-                    }
-                    foreach (var thread in listthread2)
-                    {
-                        thread.Join();
-                    }
                     th.Join();
                 }
             }

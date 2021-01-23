@@ -8,7 +8,7 @@ namespace Magistr2
     {
 
         public int[] rest = new int[256];
-        public Bitmap MakeGrayscale3(Bitmap original, float k)
+        public Bitmap MakeGrayscale3(Bitmap original, float k=0f)
         {
             Bitmap newBitmap = new Bitmap(original.Width, original.Height);
             Graphics g = Graphics.FromImage(newBitmap);
@@ -74,66 +74,47 @@ namespace Magistr2
             int i = 0, j = 0;
             while (i < img.Width-1)
             {
-                if (j == img.Height)
+                if (img.GetPixel(i, j).R != colorBackr)
+                {
+                    
+                        objectsPoints.Add(new Point(i, j));
+                }
+                if (j == img.Height-1)
                 {
                     j = 0;
                     i++;
                 }
-                if (img.GetPixel(i, j).R != colorBackr)
-                {
-                    objectsPoints.Add(new Point(i, j));
-                }
+                else
                 j++;
             }
             int xmin = int.MaxValue, ymin = int.MaxValue, ymax = int.MinValue, xmax = int.MinValue;
             foreach (Point pt in objectsPoints)
-            {
-                if (objectsPoints.Contains(pt))
-                {
+            {   
                     if (pt.X > xmax) xmax = pt.X;
                     if (pt.X < xmin) xmin = pt.X;
                     if (pt.Y > ymax) ymax = pt.Y;
                     if (pt.Y < ymin) ymin = pt.Y;
-                }
             }
-
+            
             int[,] resmat = new int[xmax - xmin + 1, ymax - ymin + 1];
+            for(int k=0;k< xmax - xmin+1;k++)
+            {
+                for (int l = 0; l < ymax - ymin+1; l++)
+                    resmat[k, l] = -1;
+            }
             int y1 = 0, x1 = 0;
             for (int y = ymin; y <= ymax; y++)
             {
                 for (int x = xmin; x <= xmax; x++)
                 {
-                    resmat[x1, y1] = tecImg.GetPixel(x, y).R;
+                    if (tecImg.GetPixel(x, y).R != 0)
+                    {
+                        resmat[x1, y1] = tecImg.GetPixel(x, y).R;
+                    }
                     x1++;
                 }
                 x1 = 0;
                 y1++;
-            }
-            bool flag;
-            int ydet = ymax - ymin; 
-            int xdet=xmax-xmin-1;
-            int k = 0, l = 0;
-            flag = true;
-            while(k<xdet)  
-            {
-                var tr = new Point(k + xmin, l + ymin);
-                if (l==ydet)
-                {
-                    k++;
-                    l = 0;
-                }
-                    if (!objectsPoints.Contains(tr) && flag)
-                    {
-                        resmat[k, l] = -1;
-                    }
-                    else
-                    {
-                        if (flag)
-                            flag = false;
-                        else
-                            flag = true;
-                    }
-                l++;
             }
             return resmat;
         }

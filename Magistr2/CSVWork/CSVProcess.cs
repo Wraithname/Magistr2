@@ -22,7 +22,7 @@ namespace Magistr2.CSVWork
         }
         public void CalculatingTextureByTasks(string folderPath, float fx)
         {
-            string[] imgall = Directory.GetFiles(folderPath);
+            string[] imgall = Directory.GetFiles(folderPath+ "//Brightness "+fx.ToString());
             TextureRes texture = new TextureRes();
             ImageProcessing imgproc = new ImageProcessing();
             int i = 0;
@@ -35,7 +35,7 @@ namespace Magistr2.CSVWork
             double[] resultCalculation6 = new double[imgall.Length];
             foreach (string img in imgall)
             {
-                Bitmap gray = imgproc.MakeGrayscale3(new Bitmap(img), fx);
+                Bitmap gray = imgproc.MakeGrayscale3(new Bitmap(img));
                 int[,] colorGray = imgproc.GetCountorPoints(gray);
                 var qvant = imgproc.GetHistogramm(gray, colorGray);
                 int[,] graycl = texture.GrayClasses(colorGray, qvant);
