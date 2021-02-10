@@ -39,7 +39,8 @@ namespace Magistr2
                     for (int y = 0; y < image.Height; y++)
                     {
                         int i = image.GetPixel(x, y).R;
-                        rest[i]++;
+                        if (i != -1)
+                            rest[i]++;
                     }
                 for (int i = 0; i < 256; i++)
                 {

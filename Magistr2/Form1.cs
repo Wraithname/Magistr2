@@ -29,31 +29,54 @@ namespace Magistr2
         private void OpenImg_Click(object sender, EventArgs e)
         {
             #region Работа с массивом изображений
-            /*
+            
             using (FolderBrowserDialog fbd = new FolderBrowserDialog())
             {
                 if (fbd.ShowDialog() == DialogResult.OK)
                 {
                     this.Hide();
+                    Thread[] tre = new Thread[3];
+                    tre[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .1f));
+                    tre[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .2f));
+                    tre[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .3f));
+                    foreach(Thread t in tre)
+                    {
+                        t.Start();
+                    }
+                    foreach(Thread t in tre)
+                    {
+                        t.Join();
+                    }
                     Thread th = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, 0f));
                     th.IsBackground = true;
                     th.Start();
                     th.Join();
+                    tre[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.1f));
+                    tre[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.2f));
+                    tre[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.3f));
+                    foreach (Thread t in tre)
+                    {
+                        t.Start();
+                    }
+                    foreach (Thread t in tre)
+                    {
+                        t.Join();
+                    }
                 }
             }
             MessageBox.Show("Расчёт окончен. Результаты находятся в папке 'C:\r'", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            */
+            this.Show();
+
             #endregion
             #region Работа с одним изображением
-            
+            /*
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 ofd.Filter = "Image Files(*.jpg; *.jpeg; *.png; *.bmp)|*.jpg; *.jpeg; *.png; *.bmp";
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
                     Image img = Image.FromFile(ofd.FileName);
-                    
-                    Bitmap gray = imgproc.MakeGrayscale3(new Bitmap(ofd.FileName), 0f);
+                   Bitmap gray = imgproc.MakeGrayscale3(new Bitmap(ofd.FileName), -.1f);
                     var objectsPoints = imgproc.GetCountorPoints(gray);
                     ImagePlace.Image = gray;
 
@@ -69,8 +92,7 @@ namespace Magistr2
                       {111,113,115,130,135,149,103,136,109,111},
                       {115,101,126,147,119,138,115,139,93,100}
                   };
-                    
-                    //int[,] colorGray = texture.ConvertImgToMatrix(gray);
+
                     var qvant = imgproc.GetHistogramm(gray, objectsPoints);
                     for (int j = 0; j < 255; j++)
                     {
@@ -84,7 +106,7 @@ namespace Magistr2
 
                 }
             }
-            
+            */
             #endregion
 
         }
