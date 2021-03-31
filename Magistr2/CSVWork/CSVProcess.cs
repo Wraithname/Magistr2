@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Magistr2.CSVWork
@@ -9,10 +10,11 @@ namespace Magistr2.CSVWork
     {
         private void WriteToFile(List<double[]> result, string name, float fx)
         {
-            if (!Directory.Exists(@"C:\r"))
-                Directory.CreateDirectory(@"C:\r");
-
-            string pathCsvFile = @"C:\r\Britnes" + fx.ToString() + ".csv";
+            if (!Directory.Exists(@"C:\Users\UserHome\Desktop\Магистр\Result"))
+                Directory.CreateDirectory(@"C:\Users\UserHome\Desktop\Магистр\Result");
+            if (!Directory.Exists(@"C:\Users\UserHome\Desktop\Магистр\Result\" + name))
+                Directory.CreateDirectory(@"C:\Users\UserHome\Desktop\Магистр\Result\" + name);
+            string pathCsvFile = @"C:\Users\UserHome\Desktop\Магистр\Result\"+name+@"\Brightnes" + fx.ToString() + ".csv";
             string delimiter = ";";
             StringBuilder sb = new StringBuilder();
             int j = 0;
@@ -25,7 +27,8 @@ namespace Magistr2.CSVWork
         }
         public void CalculatingTextureByTasks(string folderPath, float fx)
         {
-            string[] imgall = Directory.GetFiles(folderPath+ "//Brightness "+fx.ToString());
+            string[] imgall = Directory.GetFiles(folderPath+ "\\Brightnes" + fx.ToString());
+            string folder = folderPath.Split('\\').Last();
             TextureRes texture = new TextureRes();
             ImageProcessing imgproc = new ImageProcessing();
             int i = 0;
@@ -52,7 +55,7 @@ namespace Magistr2.CSVWork
                 resultCalculation.Add(rec);
                 i++;
             }
-            WriteToFile(resultCalculation, "Power", fx);
+            WriteToFile(resultCalculation, folder, fx);
 
         }
     }
