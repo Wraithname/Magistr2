@@ -15,7 +15,7 @@ namespace Magistr2
         /// <param name="qvant">Цветовой спектр</param>
         /// <param name="rst">Спектр с количеством пикселей каждой яркости</param>
         /// <returns>Текстурные признаки</returns>
-        public double[] Calculation(int[,] matrix, List<int> qvant, int[] rst, int colvo = 5)
+        public double[] Calculation(int[,] matrix, List<int> qvant, int[] rst, int colvo = 2)
         {
             masslength = qvant.Count();
             int[,] graycl = GrayClasses(matrix, qvant, colvo);
@@ -42,10 +42,20 @@ namespace Magistr2
             {
                 for (int j = 0; j < img.Width; j++)
                 {
-                    matrix[j, i] = img.GetPixel(j, i).R;
+                    matrix[j, i] = (img.GetPixel(j, i).R+ img.GetPixel(j, i).G+ img.GetPixel(j, i).B)/3;
                 }
             }
             return matrix;
+        }
+        private double[,] ConvertMatIntToDouble(int[,] mat)
+        {
+            double[,] res = new double[(mat.GetUpperBound(0) + 1), mat.Length / (mat.GetUpperBound(0) + 1)];
+            for (int i = 0; i < (mat.GetUpperBound(0) + 1); i++)
+                for (int j = 0; j < mat.Length / (mat.GetUpperBound(0) + 1); j++)
+                {
+                    res[i, j] = Convert.ToDouble(mat[i, j]);
+                }
+            return res;
         }
         public int[,] ConvertImgToMatrix(Bitmap img, int fx)
         {
@@ -69,6 +79,44 @@ namespace Magistr2
             int[,] matrixGrayCl = new int[matrix.GetUpperBound(0) + 1, matrix.Length / (matrix.GetUpperBound(0) + 1)];
             switch (colvo)
             {
+                case 2:
+                    {
+                        int step = 255 / 2;
+                        for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
+                        {
+                            for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
+                            {
+                                if (matrix[i, j] != -1)
+                                {
+                                    if (matrix[i, j] <= step)
+                                        matrixGrayCl[i, j] = 0;
+                                    if (matrix[i, j] > step )
+                                        matrixGrayCl[i, j] = 1;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 3:
+                    {
+                        int step = qvant.Count() / 3;
+                        for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
+                        {
+                            for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
+                            {
+                                if (matrix[i, j] != -1)
+                                {
+                                    if (matrix[i, j] <= qvant[step])
+                                        matrixGrayCl[i, j] = 0;
+                                    if (matrix[i, j] > qvant[step] && matrix[i, j] <= qvant[step * 2])
+                                        matrixGrayCl[i, j] = 1;
+                                    if (matrix[i, j] > qvant[step * 2] * 2 && matrix[i, j] <= qvant[step * 3])
+                                        matrixGrayCl[i, j] = 2;
+                                }
+                            }
+                        }
+                    }
+                    break;
                 case 5:
                     {
                         int step = qvant.Count() / 4;
@@ -96,7 +144,7 @@ namespace Magistr2
                     break;
                 case 32:
                     {
-                        int step = qvant.Count() / 31;
+                        int step = qvant.Count() / 32;
 
                         for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
                         {

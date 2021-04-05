@@ -50,7 +50,7 @@
             // 
             // OpenImg
             // 
-            this.OpenImg.Location = new System.Drawing.Point(547, 12);
+            this.OpenImg.Location = new System.Drawing.Point(642, 12);
             this.OpenImg.Name = "OpenImg";
             this.OpenImg.Size = new System.Drawing.Size(75, 23);
             this.OpenImg.TabIndex = 1;
@@ -62,7 +62,7 @@
             // 
             this.ResultRes.Location = new System.Drawing.Point(275, 12);
             this.ResultRes.Name = "ResultRes";
-            this.ResultRes.Size = new System.Drawing.Size(266, 252);
+            this.ResultRes.Size = new System.Drawing.Size(361, 252);
             this.ResultRes.TabIndex = 2;
             this.ResultRes.Text = "";
             // 
