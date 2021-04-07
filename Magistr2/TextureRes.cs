@@ -18,6 +18,7 @@ namespace Magistr2
         public double[] Calculation(int[,] matrix, List<int> qvant, int[] rst, int colvo = 2)
         {
             masslength = qvant.Count();
+            
             int[,] graycl = GrayClasses(matrix, qvant, colvo);
             double[,] resMat = MatrixCalculation(graycl, colvo);
             double[] res = new double[11];
@@ -42,7 +43,7 @@ namespace Magistr2
             {
                 for (int j = 0; j < img.Width; j++)
                 {
-                    matrix[j, i] = (img.GetPixel(j, i).R+ img.GetPixel(j, i).G+ img.GetPixel(j, i).B)/3;
+                    matrix[j, i] = (img.GetPixel(j, i).R + img.GetPixel(j, i).G + img.GetPixel(j, i).B) / 3;
                 }
             }
             return matrix;
@@ -90,7 +91,7 @@ namespace Magistr2
                                 {
                                     if (matrix[i, j] <= step)
                                         matrixGrayCl[i, j] = 0;
-                                    if (matrix[i, j] > step )
+                                    if (matrix[i, j] > step)
                                         matrixGrayCl[i, j] = 1;
                                 }
                             }
@@ -284,22 +285,16 @@ namespace Magistr2
         }
         public double Correl(double[,] matrix)
         {
-            double entr = 0, up = 0, left = 0, right = 0;
+            double entr = 0, up = 0;
             var hx = midleqvadrx(matrix);
             var hy = midleqvadry(matrix);
-            var dx = srqvadrx(matrix, hx);
-            var dy = srqvadry(matrix, hy);
+            var quadx = srqvadrx(matrix, hx);
+            var quady = srqvadry(matrix, hy);
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
-            {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                {
-                    up += (i + 1) * (j + 1) * matrix[i, j] - (hx[i] * hy[j]);
-                    left += dx[i];
-                    right += dy[j];
-                }
-            }
-            entr = up / Math.Sqrt(left * right);
-            return entr;
+                    up += (i- hx) * (j- hy) * matrix[i, j];
+            entr = up / Math.Sqrt(quadx * quady);
+                    return entr;
         }
         public double Disper(double[,] matrix)
         {
@@ -318,12 +313,9 @@ namespace Magistr2
         {
             double res = 0;
             var sr = VectSum(matrix);
-            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
+            for (int i = 0; i < (matrix.GetUpperBound(0) + 1) + matrix.Length / (matrix.GetUpperBound(0) + 1); i++)
             {
-                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                {
-                    res += ((i + 1) + (j + 1)) * sr[i + j];
-                }
+                    res += ((i + 1)) * sr[i];
             }
             return res;
         }
@@ -331,15 +323,12 @@ namespace Magistr2
         {
             double res = 0, left = 0, right = 0;
             var sr = VectSum(matrix);
-            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
+            for (int i = 0; i < sr.Length; i++)
             {
-                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                {
-                    left = sr[i + j];
-                    right = Math.Log(sr[i + j]);
+                    left = sr[i];
+                    right = Math.Log(sr[i]);
                     if (left != 0 && right != 0)
                         res += left * right;
-                }
             }
             return -res;
         }
@@ -376,14 +365,14 @@ namespace Magistr2
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
             {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    res += (1 / (1 + ((i + 1) * (i + 1) - 2 * (i + 1) * (j + 1) + (j + 1) * (j + 1)))) * matrix[i, j];
+                    res +=matrix[i,j]/(1+Math.Pow((i+1)-(j+1),2)) ;
             }
             return res;
         }
         public double Contrast(double[,] matrix)
         {
             double resSum = 0;
-            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
+                    for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                     resSum += matrix[i, j] * ((i + 1) * (i + 1) - 2 * (i + 1) * (j + 1) + (j + 1) * (j + 1));
             return resSum;
@@ -394,7 +383,7 @@ namespace Magistr2
             var sr = UnVectSum(matrix);
             var h = matrixsr(matrix);
             for (int k = 0; k < sr.Length; k++)
-                res += (sr[k] - h) * (sr[k] - h);
+                res += Math.Pow((sr[k] - h),2);
             return res / (sr.Length - 2);
         }
         public double diffEntr(double[,] matrix)
@@ -421,56 +410,41 @@ namespace Magistr2
                             res[k] += matrix[i, j];
             return res;
         }
-        double[] midleqvadrx(double[,] matrix)
+        double midleqvadrx(double[,] matrix)
         {
-            double[] res = new double[(matrix.GetUpperBound(0) + 1)];
+            double res =0;
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
             {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                {
-                    res[i] += matrix[i, j];
-                }
-                res[i] = ((i + 1) * res[i]);
+                    res += i*matrix[i, j];
             }
             return res;
         }
-        double[] midleqvadry(double[,] matrix)
+        double midleqvadry(double[,] matrix)
         {
-            double[] res = new double[(matrix.Length / (matrix.GetUpperBound(0) + 1))];
-
-            for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-            {
-                for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
-                {
-                    res[j] += matrix[i, j];
-                }
-                res[j] = (j + 1) * res[j];
-            }
-            return res;
-        }
-        double[] srqvadrx(double[,] matrix, double[] srarx)
-        {
-            double[] qvadx = new double[(matrix.GetUpperBound(0) + 1)];
+            double res = 0;
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
             {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                {
-                    qvadx[i] += (matrix[i, j] - srarx[i]) * (matrix[i, j] + srarx[i]);
-                }
+                    res += j * matrix[i, j];
             }
-            return qvadx;
+            return res ;
         }
-        double[] srqvadry(double[,] matrix, double[] srary)
+        double srqvadrx(double[,] matrix, double srarx)
         {
-            double[] qvady = new double[(matrix.Length / (matrix.GetUpperBound(0) + 1))];
-            for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-            {
-                for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
-                {
-                    qvady[j] += (matrix[i, j] - srary[j]) * (matrix[i, j] + srary[j]);
-                }
-            }
-            return qvady;
+            double sum = 0;
+            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
+                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
+                    sum += ((i  - srarx) * (i - srarx)) * matrix[i, j];
+            return sum;
+        }
+        double srqvadry(double[,] matrix, double srary)
+        {
+            double sum = 0;
+            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
+                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
+                    sum += ((j - srary) * (j - srary)) * matrix[i, j];
+            return sum;
         }
         double matrixsr(double[,] matrix)
         {
