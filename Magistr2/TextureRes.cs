@@ -7,7 +7,12 @@ namespace Magistr2
 {
     class TextureRes
     {
-        int masslength = 0;
+        int colvo = 0;
+        double[] px;
+        double[] py;
+        double hx, hy, dx, dy,hxy,hx_y;
+        double[] pxy;
+        double[] px_y;
         /// <summary>
         /// Расчёт текстурных показателей
         /// </summary>
@@ -17,10 +22,21 @@ namespace Magistr2
         /// <returns>Текстурные признаки</returns>
         public double[] Calculation(int[,] matrix, List<int> qvant, int[] rst, int colvo = 2)
         {
-            masslength = qvant.Count();
-            
+            this.colvo = colvo;
             int[,] graycl = GrayClasses(matrix, qvant, colvo);
             double[,] resMat = MatrixCalculation(graycl, colvo);
+            #region Вспомогательные переменный для расчёта
+            px = Px(resMat);
+            py = Py(resMat);
+            hx = midleqvadrx();
+            hy = midleqvadry();
+            dx = srqvadrx(px, hx);
+            dy = srqvadry(py, hy);
+            pxy = VectSum(resMat);
+            px_y = UnVectSum(resMat);
+            hxy = Hxy(pxy);
+            hx_y = Hx_y(px_y);
+            #endregion
             double[] res = new double[11];
             res[0] = MatrixPower(resMat);
             res[1] = Correl(resMat);
@@ -286,14 +302,10 @@ namespace Magistr2
         public double Correl(double[,] matrix)
         {
             double entr = 0, up = 0;
-            var hx = midleqvadrx(matrix);
-            var hy = midleqvadry(matrix);
-            var quadx = srqvadrx(matrix, hx);
-            var quady = srqvadry(matrix, hy);
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                     up += (i- hx) * (j- hy) * matrix[i, j];
-            entr = up / Math.Sqrt(quadx * quady);
+            entr = up / Math.Sqrt(dx * dy);
                     return entr;
         }
         public double Disper(double[,] matrix)
@@ -365,7 +377,7 @@ namespace Magistr2
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
             {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    res +=matrix[i,j]/(1+Math.Pow((i+1)-(j+1),2)) ;
+                    res += matrix[i, j] / (1 + Math.Pow((i + 1) - (j + 1), 2));
             }
             return res;
         }
@@ -374,7 +386,7 @@ namespace Magistr2
             double resSum = 0;
                     for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    resSum += matrix[i, j] * ((i + 1) * (i + 1) - 2 * (i + 1) * (j + 1) + (j + 1) * (j + 1));
+                    resSum += matrix[i, j] * Math.Pow((i-j),2);
             return resSum;
         }
         public double diffDisp(double[,] matrix)
@@ -402,49 +414,69 @@ namespace Magistr2
         #region Вспомогательные функции
         double[] UnVectSum(double[,] matrix)
         {
-            double[] res = new double[(matrix.GetUpperBound(0) + 1) + matrix.Length / (matrix.GetUpperBound(0) + 1)];
-            for (int k = 0; k < res.Length; k++)
+            double[] res = new double[(matrix.GetUpperBound(0) + 1)];
                 for (int i = (matrix.GetUpperBound(0) + 1) - 1; i >= 0; i--)
                     for (int j = matrix.Length / (matrix.GetUpperBound(0) + 1) - 1; j >= 0; j--)
-                        if (k == (i - j))
-                            res[k] += matrix[i, j];
+                            res[Math.Abs(i - j)] += matrix[i, j]/colvo;
             return res;
         }
-        double midleqvadrx(double[,] matrix)
-        {
-            double res =0;
-            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
-            {
-                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    res += i*matrix[i, j];
-            }
-            return res;
-        }
-        double midleqvadry(double[,] matrix)
+        double Hxy(double[] pxy)
         {
             double res = 0;
+            for (int k = 1; k < pxy.Length; k++)
+                res += (k + 1) * pxy[k];
+            return res;
+        }
+        double Hx_y(double[] px_y)
+        {
+            double res = 0;
+            for (int k = 0; k < px_y.Length-1; k++)
+                res += (k + 1) * px_y[k];
+            return res;
+        }
+        double[] Px(double[,] matrix)
+        {
+            double[] res = new double[(matrix.GetUpperBound(0) + 1)];
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
-            {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    res += j * matrix[i, j];
-            }
+                    res[i] += matrix[i, j]/ colvo;
+                    return res;
+        }
+        double[] Py(double[,] matrix)
+        {
+            double[] res = new double[(matrix.GetUpperBound(0) + 1)];
+            for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
+                for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
+                    res[j] += matrix[i, j]/ colvo;
+            return res;
+        }
+        double midleqvadrx()
+        {
+            double res =0;
+           for(int i=0;i<px.Length;i++)
+                    res += i* px[i];
+            return res;
+        }
+        double midleqvadry()
+        {
+            double res = 0;
+            for (int j = 0; j < py.Length; j++)
+                res += j * py[j];
             return res ;
         }
-        double srqvadrx(double[,] matrix, double srarx)
+        double srqvadrx(double[] px,double srarx)
         {
             double sum = 0;
-            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
-                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    sum += ((i  - srarx) * (i - srarx)) * matrix[i, j];
-            return sum;
+            for (int i = 0; i < px.Length; i++)
+                    sum += ((i  - srarx) * (i - srarx)) * px[i];
+            return Math.Sqrt(sum);
         }
-        double srqvadry(double[,] matrix, double srary)
+        double srqvadry(double[] py, double srary)
         {
             double sum = 0;
-            for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
-                for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    sum += ((j - srary) * (j - srary)) * matrix[i, j];
-            return sum;
+            for (int i = 0; i < py.Length; i++)
+                    sum += ((i - srary) * (i - srary)) * py[i];
+            return Math.Sqrt(sum);
         }
         double matrixsr(double[,] matrix)
         {
@@ -461,18 +493,14 @@ namespace Magistr2
         }
         double[] VectSum(double[,] matrix)
         {
-            double[] res = new double[(matrix.GetUpperBound(0) + 1) + matrix.Length / (matrix.GetUpperBound(0) + 1)];
-            for (int k = 0; k < res.Length; k++)
-            {
+            double[] res = new double[(matrix.GetUpperBound(0) + 1) +( matrix.Length / (matrix.GetUpperBound(0) + 1))];
                 for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
                 {
                     for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
                     {
-                        if (k == (i + j))
-                            res[k] += matrix[i, j];
+                            res[(i + j)] += matrix[i, j]/colvo;
                     }
                 }
-            }
             return res;
         }
         #endregion
