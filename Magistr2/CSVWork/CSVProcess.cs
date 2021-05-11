@@ -43,15 +43,15 @@ namespace Magistr2.CSVWork
                 double[,] resMat = texture.MatrixCalculation(graycl,32);
                 rec[0] = texture.MatrixPower(resMat);
                 rec[1] = texture.Correl(resMat);
-                //rec[2] = texture.Disper(resMat);
+                rec[2] = texture.Autocorrel(resMat);
                 rec[3] = texture.SumSr(resMat);
                 rec[4] = texture.SumDisp(resMat);
-                rec[5] = texture.SumEntr(resMat);
+                rec[5] = texture.ClusterProm(resMat);
                 rec[6] = texture.Entrop(resMat);
                 rec[7] = texture.Contrast(resMat);
                 rec[8] = texture.Odnorod(resMat);
-                rec[9] = texture.diffDisp(resMat);
-                //rec[10] = texture.diffEntr(resMat);
+                rec[9] = texture.diffVar(resMat);
+                rec[10] = texture.diffEntr(resMat);
                 resultCalculation.Add(rec);
                 i++;
             }

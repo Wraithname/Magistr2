@@ -15,7 +15,7 @@ namespace Magistr2
         double[] result;
         ImageProcessing imgproc;
         CSVProcess process;
-        string[] name = new string[]{ "Энергия", "Корреляция", "Дисперсия", "Сумма средних", "Сумма дисперсий", "Сумма энтропий", "Энтропия", "Контрастность", "Однородность", "Разница Дисперсий", "Разница Энтропий" };
+        string[] name = new string[]{ "Energy", "Correlation", "Autocorrelation", "Sum average", "Sum variance", "Cluster prominence", "Entropy", "Contrast", "Homogeneity", "Difference variance", "Difference entropy" };
         #endregion
         public Form1()
         {
