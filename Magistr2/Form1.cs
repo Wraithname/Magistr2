@@ -15,7 +15,7 @@ namespace Magistr2
         double[] result;
         ImageProcessing imgproc;
         CSVProcess process;
-        string[] name = new string[]{ "Energy", "Correlation", "Autocorrelation", "Sum average", "Sum variance", "Cluster prominence", "Entropy", "Contrast", "Homogeneity", "Difference variance", "Difference entropy" };
+        string[] name = new string[]{ "Energy", "Correlation", "Autocorrelation", "Sum average", "Sum variance", "Cluster prominence", "Dissimilarity", "Contrast", "Homogeneity", "Difference variance", "Difference entropy" };
         #endregion
         public Form1()
         {
@@ -28,7 +28,7 @@ namespace Magistr2
         private void OpenImg_Click(object sender, EventArgs e)
         {
             #region Работа с массивом изображений
-            /*
+            
             using (FolderBrowserDialog fbd = new FolderBrowserDialog())
             {
                 if (fbd.ShowDialog() == DialogResult.OK)
@@ -36,9 +36,9 @@ namespace Magistr2
             
                     this.Hide();
                     Thread[] tre = new Thread[3];
-                    tre[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .1f));
-                    tre[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .2f));
-                    tre[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .3f));
+                    tre[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .1f,32));
+                    tre[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .2f, 32));
+                    tre[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .3f, 32));
                     foreach(Thread t in tre)
                     {
                         t.Start();
@@ -47,13 +47,13 @@ namespace Magistr2
                     {
                         t.Join();
                     }
-                    Thread th = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, 0f));
+                    Thread th = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, 0f, 32));
                     th.IsBackground = true;
                     th.Start();
                     th.Join();
-                    tre[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.1f));
-                    tre[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.2f));
-                    tre[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.3f));
+                    tre[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.1f, 32));
+                    tre[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.2f, 32));
+                    tre[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.3f, 32));
                     foreach (Thread t in tre)
                     {
                         t.Start();
@@ -66,9 +66,10 @@ namespace Magistr2
             }
             MessageBox.Show("Расчёт окончен. Результаты находятся в папке 'C:\r'", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.Show();
-*/
+
             #endregion
             #region Работа с одним изображением
+            /*
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 ofd.Filter = "Image Files(*.jpg; *.jpeg; *.png; *.bmp)|*.jpg; *.jpeg; *.png; *.bmp";
@@ -106,7 +107,7 @@ namespace Magistr2
 
                 }
             }
-            
+            */
             #endregion
 
         }

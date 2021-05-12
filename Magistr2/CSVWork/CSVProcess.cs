@@ -25,11 +25,12 @@ namespace Magistr2.CSVWork
             }
             File.WriteAllText(pathCsvFile, sb.ToString());
         }
-        public void CalculatingTextureByTasks(string folderPath, float fx)
+        public void CalculatingTextureByTasks(string folderPath, float fx,int colvo=2)
         {
             string[] imgall = Directory.GetFiles(folderPath+ "\\Brightnes" + fx.ToString());
             string folder = folderPath.Split('\\').Last();
             TextureRes texture = new TextureRes();
+            texture.CalculateDelta(colvo);
             ImageProcessing imgproc = new ImageProcessing();
             int i = 0;
            List<double[]> resultCalculation = new List<double[]>();
@@ -41,13 +42,14 @@ namespace Magistr2.CSVWork
                 var qvant = imgproc.GetHistogramm(gray, colorGray);
                 int[,] graycl = texture.GrayClasses(colorGray, qvant);
                 double[,] resMat = texture.MatrixCalculation(graycl,32);
+                texture.CalculateValues(resMat);
                 rec[0] = texture.MatrixPower(resMat);
                 rec[1] = texture.Correl(resMat);
                 rec[2] = texture.Autocorrel(resMat);
                 rec[3] = texture.SumSr(resMat);
                 rec[4] = texture.SumDisp(resMat);
                 rec[5] = texture.ClusterProm(resMat);
-                rec[6] = texture.Entrop(resMat);
+                rec[6] = texture.Dissimilarity(resMat);
                 rec[7] = texture.Contrast(resMat);
                 rec[8] = texture.Odnorod(resMat);
                 rec[9] = texture.diffVar(resMat);

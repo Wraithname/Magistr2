@@ -7,7 +7,7 @@ namespace Magistr2
 {
     class TextureRes
     {
-        int colvo = 0;
+        double colvo = 0;
         double[] px;
         double[] py;
         double hx, hy, dx, dy, hxy, hx_y;
@@ -23,12 +23,33 @@ namespace Magistr2
         /// <returns>Текстурные признаки</returns>
         public double[] Calculation(int[,] matrix, List<int> qvant, int[] rst, int colvo = 2)
         {
-            this.colvo = colvo;
-            d = 1.0 / colvo;
-            d_xy = 1.0 / (2 * colvo - 1);
-            d_ij = 1.0 / (colvo * colvo);
+            CalculateDelta(colvo);
             int[,] graycl = GrayClasses(matrix, qvant, colvo);
             double[,] resMat = MatrixCalculation(graycl, colvo);
+            CalculateValues(resMat);
+            double[] res = new double[11];
+            res[0] = MatrixPower(resMat);
+            res[1] = Correl(resMat);
+            res[2] = Autocorrel(resMat);
+            res[3] = SumSr(resMat);
+            res[4] = SumDisp(resMat);
+            res[5] = ClusterProm(resMat);
+            res[6] = Dissimilarity(resMat);
+            res[7] = Contrast(resMat);
+            res[8] = Odnorod(resMat);
+            res[9] = diffVar(resMat);
+            res[10] = diffEntr(resMat);
+            return res;
+        }
+        public void CalculateDelta(int colvo)
+        {
+            this.colvo = colvo;
+            d = 1.0 / this.colvo;
+            d_xy = 1.0 / (2.0 * this.colvo - 1.0);
+            d_ij = 1.0 / (this.colvo * this.colvo);
+        }
+        public void CalculateValues(double[,] resMat)
+        {
             #region Вспомогательные переменный для расчёта
             px = Px(resMat);
             py = Py(resMat);
@@ -40,21 +61,7 @@ namespace Magistr2
             px_y = UnVectSum(resMat);
             hxy = Hxy(pxy);
             hx_y = Hx_y(px_y);
-
             #endregion
-            double[] res = new double[11];
-            res[0] = MatrixPower(resMat);
-            res[1] = Correl(resMat);
-            res[2] = Autocorrel(resMat);
-            res[3] = SumSr(resMat);
-            res[4] = SumDisp(resMat);
-            res[5] = ClusterProm(resMat);
-            res[6] = Entrop(resMat);
-            res[7] = Contrast(resMat);
-            res[8] = Odnorod(resMat);
-            res[9] = diffVar(resMat);
-            res[10] = diffEntr(resMat);
-            return res;
         }
         #region Работа с матрицей
         public int[,] ConvertImgToMatrix(Bitmap img)
@@ -299,7 +306,7 @@ namespace Magistr2
             double res = 0;
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    res += (((i + 1) * (j + 1)) * matrix[i, j]) * d_ij;
+                    res += (((i + 1.0) * (j + 1.0)) * matrix[i, j]) * d_ij;
             return res;
         }
         public double MatrixPower(double[,] matrix)
@@ -315,7 +322,7 @@ namespace Magistr2
             double entr = 0;
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    entr += (((((i + 1) / colvo) - hx) / dx) * ((((j + 1) / colvo) - hy) / dy) * matrix[i, j]) * d_ij;
+                    entr += (((((i + 1.0) / colvo) - hx) / dx) * ((((j + 1.0) / colvo) - hy) / dy) * matrix[i, j]) * d_ij;
             return entr;
         }
         public double Autocorrel(double[,] matrix)
@@ -323,14 +330,14 @@ namespace Magistr2
             double entr = 0;
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    entr += ((i + 1) * (j + 1)) * matrix[i, j] * d_ij;
+                    entr += ((i + 1.0) * (j + 1.0)) * matrix[i, j] * d_ij;
             return entr;
         }
         public double SumSr(double[,] matrix)
         {
             double res = 0;
             for (int i = 0; i < pxy.Length; i++)
-                res += (((i + 1)) * pxy[i]) * d_xy;
+                res += (((i + 1.0)) * pxy[i]) * d_xy;
             return res;
         }
         public double ClusterProm(double[,] matrix)
@@ -338,7 +345,7 @@ namespace Magistr2
             double res = 0;
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    res += Math.Pow(((i+1)+(j+1)-2*hx),3)*matrix[i,j]*d_ij;
+                    res += Math.Pow(((i+1.0)+(j+1.0)-2.0*hx),3)*matrix[i,j]*d_ij;
             return res;
         }
         public double SumDisp(double[,] matrix)
@@ -347,22 +354,17 @@ namespace Magistr2
             var sr = VectSum(matrix);
             for (int k = 1; k < sr.Length; k++)
             {
-                left = ((2 * (k - 1)) / (2 * colvo - 1) - hxy) * ((2 * (k - 1)) / (2 * colvo - 1) - hxy);
+                left = ((2.0 * (k - 1.0)) / (2.0 * colvo - 1.0) - hxy) * ((2.0 * (k - 1.0)) / (2.0 * colvo - 1.0) - hxy);
                 res += left * sr[k] * d_xy;
             }
             return res;
         }
-        public double Entrop(double[,] matrix)
+        public double Dissimilarity(double[,] matrix)
         {
-            double res = 0, right = 0;
+            double res = 0;
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
-            {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                {
-                    right = Math.Log(matrix[i, j]);
-                    res += matrix[i, j] * right * d_ij;
-                }
-            }
+                    res += Math.Abs(((i+1)/colvo)-((j+1)/colvo))*matrix[i, j] * d_ij;
             return -res;
         }
         public double Odnorod(double[,] matrix)
@@ -371,7 +373,7 @@ namespace Magistr2
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
             {
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    res += (matrix[i, j] / (1 + Math.Pow((i + 1) / colvo - (j + 1) / colvo, 2))) * d_ij;
+                    res += (matrix[i, j] / (1.0 + Math.Pow((i + 1.0) / colvo - (j + 1.0) / colvo, 2))) * d_ij;
             }
             return res;
         }
@@ -380,7 +382,7 @@ namespace Magistr2
             double resSum = 0;
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    resSum += matrix[i, j] * Math.Pow(((i + 1) / colvo - (j + 1) / colvo), 2) * d_ij;
+                    resSum += matrix[i, j] * Math.Pow(((i + 1.0) / colvo - (j + 1.0) / colvo), 2) * d_ij;
             return resSum;
         }
         public double diffEntr(double[,] matrix)
@@ -401,7 +403,7 @@ namespace Magistr2
             var sr = UnVectSum(matrix);
             for (int k = 0; k < sr.Length - 1; k++)
             {
-                res += (((k + 1) / colvo) - hx_y) * (((k + 1) / colvo) - hx_y) * sr[k] * d;
+                res += (((k + 1.0) / colvo) - hx_y) * (((k + 1.0) / colvo) - hx_y) * sr[k] * d;
             }
             return res;
         }
@@ -419,14 +421,14 @@ namespace Magistr2
         {
             double res = 0;
             for (int k = 1; k < pxy.Length; k++)
-                res += (((2 * k - 1) / (2 * colvo - 1)) * pxy[k]) * d_xy;
+                res += (((2.0 * k - 1.0) / (2.0 * colvo - 1.0)) * pxy[k]) * d_xy;
             return res;
         }
         double Hx_y(double[] px_y)
         {
             double res = 0;
             for (int k = 0; k < px_y.Length - 1; k++)
-                res += ((k + 2) / colvo * px_y[k]) * d;
+                res += ((k + 2.0) / colvo * px_y[k]) * d;
             return res;
         }
         double[] Px(double[,] matrix)
@@ -449,14 +451,14 @@ namespace Magistr2
         {
             double res = 0;
             for (int i = 0; i < px.Length; i++)
-                res += (((i + 1) / colvo) * px[i]) * d;
+                res += (((i + 1.0) / colvo) * px[i]) * d;
             return res;
         }
         double midleqvadry()
         {
             double res = 0;
             for (int j = 0; j < py.Length; j++)
-                res += (((j + 1) / colvo) * py[j]) * d;
+                res += (((j + 1.0) / colvo) * py[j]) * d;
             return res;
         }
         double srqvadrx(double[] px, double srarx)
