@@ -7,7 +7,6 @@ namespace Magistr2
 {
     class TextureRes
     {
-        double colvo = 0;
         double[] px;
         double[] py;
         double hx, hy, dx, dy, hxy, hx_y;
