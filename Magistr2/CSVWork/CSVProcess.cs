@@ -30,6 +30,7 @@ namespace Magistr2.CSVWork
             string[] imgall = Directory.GetFiles(folderPath+ "\\Brightnes" + fx.ToString());
             string folder = folderPath.Split('\\').Last();
             TextureRes texture = new TextureRes();
+            texture.CalculateDelta(colvo);
             ImageProcessing imgproc = new ImageProcessing();
             int i = 0;
            List<double[]> resultCalculation = new List<double[]>();
