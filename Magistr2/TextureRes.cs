@@ -327,7 +327,7 @@ namespace Magistr2
             double res = 0;
             for (int i = 0; i < (matrix.GetUpperBound(0) + 1); i++)
                 for (int j = 0; j < matrix.Length / (matrix.GetUpperBound(0) + 1); j++)
-                    res += Math.Pow(((i+1.0)+(j+1.0)-2.0*hx),3)*matrix[i,j];
+                    res += Math.Pow((i+1.0)+(j+1.0)-2.0*hx,3)*matrix[i,j];
             return res;
         }
         public double SumDisp(double[,] matrix)
