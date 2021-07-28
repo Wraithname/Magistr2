@@ -30,19 +30,12 @@ namespace Magistr2.CSVWork
         {
             string namefolder = folderPath + "\\Brightnes" + fx.ToString();
             string[] imgall = Directory.GetFiles(namefolder);
-            string[] result = new string[imgall.Length];
-            for (int k = 0; k < imgall.Length; k++)
-            {
-                string tpr = imgall[k].Split('\\').Last();
-                int num = Convert.ToInt32(tpr.Split('.').First());
-                result[num] = imgall[k];
-            }
             string folder = folderPath.Split('\\').Last();
             TextureRes texture = new TextureRes();
             ImageProcessing imgproc = new ImageProcessing();
             int i = 0;
            List<double[]> resultCalculation = new List<double[]>();
-            foreach (string img in result)
+            foreach (string img in imgall)
             {
                 double[] rec = new double[11];
                 Bitmap gray = imgproc.MakeGrayscale3(new Bitmap(img));

@@ -36,33 +36,33 @@ namespace Magistr2
             
                     this.Hide();
                     
-                    //Thread[] tre = new Thread[3];
-                    //tre[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .1f,32));
-                    //tre[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .2f, 32));
-                    //tre[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .3f, 32));
-                    //foreach(Thread t in tre)
-                    //{
-                    //    t.Start();
-                    //}
-                    //foreach(Thread t in tre)
-                    //{
-                    //    t.Join();
-                    //}
+                    Thread[] tre = new Thread[3];
+                    tre[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .1f, 32));
+                    tre[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .2f, 32));
+                    tre[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, .3f, 32));
+                    foreach (Thread t in tre)
+                    {
+                        t.Start();
+                    }
+                    foreach (Thread t in tre)
+                    {
+                        t.Join();
+                    }
                     Thread th = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, 0f, 32));
                     th.IsBackground = true;
                     th.Start();
                     th.Join();
-                    //tre[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.1f, 32));
-                    //tre[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.2f, 32));
-                    //tre[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.3f, 32));
-                    //foreach (Thread t in tre)
-                    //{
-                    //    t.Start();
-                    //}
-                    //foreach (Thread t in tre)
-                    //{
-                    //    t.Join();
-                    //}
+                    tre[0] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.1f, 32));
+                    tre[1] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.2f, 32));
+                    tre[2] = new Thread(() => process.CalculatingTextureByTasks(fbd.SelectedPath, -.3f, 32));
+                    foreach (Thread t in tre)
+                    {
+                        t.Start();
+                    }
+                    foreach (Thread t in tre)
+                    {
+                        t.Join();
+                    }
                 }
             }
             MessageBox.Show("Расчёт окончен. Результаты находятся в папке 'C:\r'", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Information);
